@@ -1,0 +1,132 @@
+name: Deploy
+run-name: Deploy - ${{ inputs.environment }} (${{ inputs.type }})
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        description: 'Environment'
+        required: true
+        type: string
+      type:
+        description: 'Terraform Run Type'
+        required: true
+        type: string
+      invalidate_cache:
+        description: "Invalidate the cache?"
+        required: false
+        default: false
+        type: boolean
+  workflow_dispatch:
+    inputs:               
+      environment:
+        description: 'Environment'
+        required: true
+        type: choice
+        options:
+          - 'sandbox'
+          - 'dev'
+          - 'qa'
+          - 'qa2'
+      type:
+        description: 'Terraform Run Type'
+        required: true
+        type: choice
+        options:
+          - 'plan'
+          - 'apply'
+
+      invalidate_cache:
+        description: "Invalidate the cache?"
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  base_infra:
+    name: Base Infra
+    runs-on: ubuntu-latest-arm
+
+    strategy:
+      fail-fast: false
+      matrix:
+        region: [ "us-east-1" ]
+
+    permissions:
+      id-token: write
+      contents: read
+
+    environment: ${{ inputs.environment }}
+
+    env:
+      AWS_REGION: ${{ matrix.region }}
+      TF_ENV_NAME: ${{ inputs.environment }}
+      TF_MODULE_NAME: base_infra
+      TF_CONFIG_DIR: terraform/configs/${{ inputs.environment }}/base_infra/${{ matrix.region }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Terraform Run
+        uses: 3clife-org/actions.terraform-run@v0.1.0
+        with:
+          type: ${{ inputs.type }}
+          region: ${{ matrix.region }}
+          tf_modules_app_id: ${{ secrets.TF_MODULES_APP_ID }}
+          tf_modules_pk: ${{ secrets.TF_MODULES_PK }}
+
+  artifact:
+    needs: base_infra
+    name: Artifact
+    if: ${{ inputs.type == 'apply' }}
+    runs-on: ubuntu-latest-arm
+
+    strategy:
+      fail-fast: false
+      matrix:
+        region: [ "us-east-1" ]
+
+    environment: ${{ inputs.environment }}
+
+    env:
+      AWS_REGION: ${{ matrix.region }}
+      TF_ENV_NAME: ${{ inputs.environment }}
+      TF_MODULE_NAME: base_infra
+      TF_CONFIG_DIR: terraform/configs/${{ inputs.environment }}/base_infra/${{ matrix.region }}
+
+    permissions:
+      id-token: write
+      contents: read
+      packages: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Injecting Environment Variables
+        shell: bash
+        run: cat ${{ env.TF_CONFIG_DIR }}/.env | xargs -I {} echo {} >> $GITHUB_ENV
+
+      - name: Assume Role
+        uses: 3clife-org/actions.assume-role@v0.1.0
+        with:
+          region: ${{ matrix.region }}      
+
+      - name: Build and push to S3
+        shell: bash
+        run: make deploy
+
+      - name: Invalidate cache
+        if: inputs.invalidate_cache == true
+        shell: bash
+        run: make invalidate-cache
+
+
+
+

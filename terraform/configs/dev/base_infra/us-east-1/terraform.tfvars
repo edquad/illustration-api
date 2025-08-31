@@ -1,0 +1,6 @@
+target_env="c3ldev1use1"
+target_account = "183295426999"
+target_region = "us-east-1"
+app_env = "dev"
+domain_prefix = "vite-react-spa"
+hosted_zone_name = "dev1.ceresinsurance.com"

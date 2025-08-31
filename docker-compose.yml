@@ -1,0 +1,36 @@
+services:
+  node:
+    image: node:latest
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+      - node_modules:/usr/src/app/node_modules
+    working_dir: /usr/src/app
+    entrypoint: /bin/bash
+    command: -c "sleep infinity"
+
+  terraform:
+    image: hashicorp/terraform:latest
+    volumes:
+      - ./terraform:/workspace/terraform
+      - ~/.aws:/root/.aws
+      - ~/.gitconfig:/root/.gitconfig
+      - ~/.ssh:/root/.ssh
+    working_dir: /workspace
+    environment:
+      - AWS_REGION=${AWS_REGION:-us-east-1}
+      - AWS_ACCESS_KEY_ID
+      - AWS_SECRET_ACCESS_KEY
+      - AWS_SESSION_TOKEN
+      - AWS_PROFILE
+      - TF_VAR_tf_state_bucket
+      - TF_VAR_tf_state_project_key
+
+  tflint:
+    image: ghcr.io/terraform-linters/tflint:latest
+    volumes:
+      - .:/data
+
+volumes:
+  node_modules: null

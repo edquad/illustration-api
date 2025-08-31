@@ -1,0 +1,6 @@
+target_env="c3lqa1use1"
+target_account = "605134449127"
+target_region = "us-east-1"
+app_env = "qa2"
+domain_prefix = "vite-react-spa-qa2"
+hosted_zone_name = "qa1.ceresinsurance.com"

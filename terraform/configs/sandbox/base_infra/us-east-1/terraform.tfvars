@@ -1,0 +1,6 @@
+target_account = "825765414149"
+target_region = "us-east-1"
+target_env    = "c3lsbx1use1"
+app_env = "sandbox"
+domain_prefix = "vite-react-spa"
+hosted_zone_name = "sandbox1.ceresinsurance.com"

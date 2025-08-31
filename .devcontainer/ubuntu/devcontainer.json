@@ -1,0 +1,22 @@
+{
+	"name": "Ubuntu",
+	"image": "mcr.microsoft.com/devcontainers/universal:2",
+	"features": {
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {}
+	},
+	// "postStartCommand": "${localWorkspaceFolder}/.devcontainer/ubuntu/update_content.sh",
+	// "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
+	// "workspaceFolder": "/workspace",
+	"remoteEnv": {
+		"GITHUB_TOKEN": "${localEnv:GITHUB_TOKEN}"
+	},
+	"customizations": {
+        "codespaces": {
+            "repositories": {
+                "3clife-org/*":{
+                    "permissions": "read-all"
+                }
+            }
+        }
+    }
+}

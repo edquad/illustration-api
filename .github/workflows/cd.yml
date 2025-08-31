@@ -1,0 +1,36 @@
+name: Continuous Deployment
+
+on:
+  workflow_run:
+    workflows: ["Build Pipeline"]
+    branches:
+      - main
+    types:
+      - completed
+
+permissions:
+  id-token: write
+  contents: read
+  packages: read
+
+jobs:
+  sandbox:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: sandbox
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      environment: sandbox
+      type: apply
+      invalidate_cache: false
+
+  dev:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    name: dev
+    needs: sandbox
+    uses: ./.github/workflows/deploy.yml
+    secrets: inherit
+    with:
+      environment: dev
+      type: apply
+      invalidate_cache: false  

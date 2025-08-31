@@ -1,0 +1,33 @@
+name: Build Pipeline
+
+permissions:
+  contents: read
+  packages: read
+
+on:
+  push:
+    branches:
+      - "**"
+    tags-ignore:
+      - "**"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest-arm
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Build
+      run: make build
+
+    - name: Lint
+      run: make lint
+
+    - name: Test
+      run: make test

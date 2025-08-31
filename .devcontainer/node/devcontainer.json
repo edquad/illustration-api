@@ -1,0 +1,23 @@
+{
+	"name": "Node",
+	"service": "node",
+	"workspaceFolder": "/usr/src/app",
+	"shutdownAction": "stopCompose",
+	"overrideCommand": true,
+	"dockerComposeFile": [
+		"../../docker-compose.yml"
+	],
+	"runServices": [
+		"node"
+	],
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"vitest.explorer",
+				"ryanluker.vscode-coverage-gutters",
+				"kingwl.vscode-vitest-runner",
+				"felixjb.testify"
+			]
+		}
+	}
+}
