@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import clientService from "../services/clientService";
+import clientService, { ClientInfo } from "../services/clientService";
 
 // Interface matching your Python ClientProfile model
 interface Client {
@@ -101,6 +101,168 @@ class ClientController {
     } catch (error) {
       console.error("Error deleting client:", error);
       res.status(500).json({ error: "Failed to delete client" });
+    }
+  }
+
+  // CLIENT_INFO methods
+  async getAllClientInfo(req: Request, res: Response): Promise<void> {
+    try {
+      const clientInfos = await clientService.getAllClientInfo();
+      res.json({
+        status: "success",
+        data: clientInfos,
+        count: clientInfos.length
+      });
+    } catch (error: any) {
+      console.error("Error fetching client info:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: "Failed to fetch client info",
+        details: error.message 
+      });
+    }
+  }
+
+  async getClientInfoById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const clientInfo = await clientService.getClientInfoById(parseInt(id));
+
+      if (!clientInfo) {
+        res.status(404).json({ 
+          status: "error",
+          error: "Client info not found" 
+        });
+        return;
+      }
+
+      res.json({
+        status: "success",
+        data: clientInfo
+      });
+    } catch (error: any) {
+      console.error("Error fetching client info by ID:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: "Failed to fetch client info",
+        details: error.message 
+      });
+    }
+  }
+
+  async getClientInfoByIllustrationId(req: Request, res: Response): Promise<void> {
+    try {
+      const { illustrationId } = req.params;
+      const clientInfos = await clientService.getClientInfoByIllustrationId(illustrationId);
+
+      res.json({
+        status: "success",
+        data: clientInfos,
+        count: clientInfos.length
+      });
+    } catch (error: any) {
+      console.error("Error fetching client info by illustration ID:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: "Failed to fetch client info",
+        details: error.message 
+      });
+    }
+  }
+
+  async createClientInfo(req: Request, res: Response): Promise<void> {
+    try {
+      const clientData: ClientInfo = req.body;
+
+      // Validate required fields
+      if (!clientData.FIRST_NAME || !clientData.LAST_NAME) {
+        res.status(400).json({ 
+          status: "error",
+          error: "FIRST_NAME and LAST_NAME are required" 
+        });
+        return;
+      }
+
+      const newClientInfo = await clientService.createClientInfo(clientData);
+      
+      res.status(201).json({
+        status: "success",
+        message: "Client info created successfully",
+        data: newClientInfo
+      });
+    } catch (error: any) {
+      console.error("Error creating client info:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: "Failed to create client info",
+        details: error.message 
+      });
+    }
+  }
+
+  async updateClientInfo(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const clientData: ClientInfo = req.body;
+
+      // Validate required fields
+      if (!clientData.FIRST_NAME || !clientData.LAST_NAME) {
+        res.status(400).json({ 
+          status: "error",
+          error: "FIRST_NAME and LAST_NAME are required" 
+        });
+        return;
+      }
+
+      const updatedClientInfo = await clientService.updateClientInfo(parseInt(id), clientData);
+      
+      if (!updatedClientInfo) {
+        res.status(404).json({ 
+          status: "error",
+          error: "Client info not found" 
+        });
+        return;
+      }
+
+      res.json({
+        status: "success",
+        message: "Client info updated successfully",
+        data: updatedClientInfo
+      });
+    } catch (error: any) {
+      console.error("Error updating client info:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: "Failed to update client info",
+        details: error.message 
+      });
+    }
+  }
+
+  async deleteClientInfo(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const deleted = await clientService.deleteClientInfo(parseInt(id));
+      
+      if (!deleted) {
+        res.status(404).json({ 
+          status: "error",
+          error: "Client info not found" 
+        });
+        return;
+      }
+
+      res.json({
+        status: "success",
+        message: "Client info deleted successfully"
+      });
+    } catch (error: any) {
+      console.error("Error deleting client info:", error);
+      res.status(500).json({ 
+        status: "error",
+        error: "Failed to delete client info",
+        details: error.message 
+      });
     }
   }
 

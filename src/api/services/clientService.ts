@@ -24,6 +24,40 @@ interface Client {
   joint_indicator?: string;
 }
 
+// Add CLIENT_INFO interface
+interface ClientInfo {
+  CLIENT_ID?: number;
+  ILLUSTRATION_ID?: string;
+  AGENT_NAME?: string;
+  ILLUSTRATION_DATE?: string;
+  FIRST_NAME: string;
+  MIDDLE_NAME?: string;
+  LAST_NAME: string;
+  FULL_NAME?: string;
+  EMAIL?: string;
+  PREMIUM?: string;
+  FIRST_TERM?: string;
+  SECOND_TERM?: string;
+  TAX_QUALIFICATION?: string;
+  WITHDRAWAL_TYPE?: string;
+  WITHDRAWAL_AMOUNT?: string;
+  WITHDRAWAL_FROM_YEAR?: number;
+  WITHDRAWAL_TO_YEAR?: number;
+  WITHDRAWAL_FREQUENCY?: string;
+  PHONE?: string;
+  DATE_OF_BIRTH?: string;
+  AGE?: number;
+  GENDER?: string;
+  SALUTATION?: string;
+  SUFFIX?: string;
+  SSN_TAX_ID?: string;
+  RESIDENCE_ADDRESS?: string;
+  STATE?: string;
+  JURISDICTION?: string;
+  CREATED_AT?: string;
+  UPDATED_AT?: string;
+}
+
 interface TermDetail {
   TERM_DETAILS_ID: number;
   TERM_DETAILS_VALUE: string;
@@ -114,6 +148,196 @@ class ClientService {
 
     this.clients.splice(index, 1);
     return true;
+  }
+
+  // CLIENT_INFO methods
+  async getAllClientInfo(): Promise<ClientInfo[]> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: clientSQL.getAllClientInfo,
+          binds: [],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in getAllClientInfo:", err);
+              reject(err);
+            } else {
+              resolve(rows || []);
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async getClientInfoById(id: number): Promise<ClientInfo | null> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: clientSQL.getClientInfoById,
+          binds: [id],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in getClientInfoById:", err);
+              reject(err);
+            } else {
+              resolve(rows && rows.length > 0 ? rows[0] : null);
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async getClientInfoByIllustrationId(illustrationId: string): Promise<ClientInfo[]> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: clientSQL.getClientInfoByIllustrationId,
+          binds: [illustrationId],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in getClientInfoByIllustrationId:", err);
+              reject(err);
+            } else {
+              resolve(rows || []);
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async createClientInfo(clientData: ClientInfo): Promise<ClientInfo> {
+    return new Promise((resolve, reject) => {
+      // Generate FULL_NAME if not provided
+      const fullName = clientData.FULL_NAME || 
+        `${clientData.FIRST_NAME} ${clientData.MIDDLE_NAME || ''} ${clientData.LAST_NAME}`.replace(/\s+/g, ' ').trim();
+
+      const binds = [
+        clientData.ILLUSTRATION_ID,
+        clientData.AGENT_NAME,
+        clientData.ILLUSTRATION_DATE,
+        clientData.FIRST_NAME,
+        clientData.MIDDLE_NAME,
+        clientData.LAST_NAME,
+        fullName,
+        clientData.EMAIL,
+        clientData.PREMIUM,
+        clientData.FIRST_TERM,
+        clientData.SECOND_TERM,
+        clientData.TAX_QUALIFICATION,
+        clientData.WITHDRAWAL_TYPE,
+        clientData.WITHDRAWAL_AMOUNT,
+        clientData.WITHDRAWAL_FROM_YEAR,
+        clientData.WITHDRAWAL_TO_YEAR,
+        clientData.WITHDRAWAL_FREQUENCY,
+        clientData.PHONE,
+        clientData.DATE_OF_BIRTH,
+        clientData.AGE,
+        clientData.GENDER,
+        clientData.SALUTATION,
+        clientData.SUFFIX,
+        clientData.SSN_TAX_ID,
+        clientData.RESIDENCE_ADDRESS,
+        clientData.STATE,
+        clientData.JURISDICTION
+      ];
+
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: clientSQL.insertClientInfo,
+          binds: binds,
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in createClientInfo:", err);
+              reject(err);
+            } else {
+              resolve({
+                ...clientData,
+                FULL_NAME: fullName
+              });
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async updateClientInfo(id: number, clientData: ClientInfo): Promise<ClientInfo | null> {
+    return new Promise((resolve, reject) => {
+      const fullName = clientData.FULL_NAME || 
+        `${clientData.FIRST_NAME} ${clientData.MIDDLE_NAME || ''} ${clientData.LAST_NAME}`.replace(/\s+/g, ' ').trim();
+
+      const binds = [
+        clientData.ILLUSTRATION_ID,
+        clientData.AGENT_NAME,
+        clientData.ILLUSTRATION_DATE,
+        clientData.FIRST_NAME,
+        clientData.MIDDLE_NAME,
+        clientData.LAST_NAME,
+        fullName,
+        clientData.EMAIL,
+        clientData.PREMIUM,
+        clientData.FIRST_TERM,
+        clientData.SECOND_TERM,
+        clientData.TAX_QUALIFICATION,
+        clientData.WITHDRAWAL_TYPE,
+        clientData.WITHDRAWAL_AMOUNT,
+        clientData.WITHDRAWAL_FROM_YEAR,
+        clientData.WITHDRAWAL_TO_YEAR,
+        clientData.WITHDRAWAL_FREQUENCY,
+        clientData.PHONE,
+        clientData.DATE_OF_BIRTH,
+        clientData.AGE,
+        clientData.GENDER,
+        clientData.SALUTATION,
+        clientData.SUFFIX,
+        clientData.SSN_TAX_ID,
+        clientData.RESIDENCE_ADDRESS,
+        clientData.STATE,
+        clientData.JURISDICTION,
+        id
+      ];
+
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: clientSQL.updateClientInfo,
+          binds: binds,
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in updateClientInfo:", err);
+              reject(err);
+            } else {
+              resolve({
+                ...clientData,
+                CLIENT_ID: id,
+                FULL_NAME: fullName
+              });
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async deleteClientInfo(id: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: clientSQL.deleteClientInfo,
+          binds: [id],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in deleteClientInfo:", err);
+              reject(err);
+            } else {
+              resolve(true);
+            }
+          },
+        });
+      });
+    });
   }
 
   async getTermDetails(): Promise<TermDetail[]> {
@@ -215,3 +439,4 @@ class ClientService {
 }
 
 export default new ClientService();
+export type { ClientInfo };
