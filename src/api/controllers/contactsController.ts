@@ -45,7 +45,7 @@ export class ContactsController {
     }
   }
 
-  // Create new contact
+  // Create new contact 
   async createContact(req: Request, res: Response) {
     try {
       const contactData: ContactInput = req.body;

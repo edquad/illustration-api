@@ -11,10 +11,10 @@ dotenv.config({
 
 export default {
   snowflake: {
-    timeout: 120000,
-    account: "TKJAEDV-RR90059",
-    username: "testuser",
-    password: "Developers2024AB",
+    timeout: parseInt(process.env.SNOWFLAKE_TIMEOUT || "120000"),
+    account: process.env.SNOWFLAKE_ACCOUNT || "",
+    username: process.env.SNOWFLAKE_USERNAME || "",
+    password: process.env.SNOWFLAKE_PASSWORD || "",
   },
   poolOpts: {
     min: 1, // Minimum size of the pool,

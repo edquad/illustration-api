@@ -5,6 +5,7 @@ import http from "http";
 import illustrationRouter from "./routes/illustrationRouter";
 import contactsRouter from "./routes/contactsRouter";
 import clientRouter from "./routes/clientRouter";
+import adminRouter from "./routes/adminRouter";
 
 const app = express();
 const PORT = process.env.PORT || 3010;
@@ -20,7 +21,8 @@ const startServer = async () => {
     // Mount routers (matches Python URL structure)
     app.use("/api/illustration", illustrationRouter());
     app.use("/api/contacts", contactsRouter);
-    app.use("/api/clients", clientRouter); // NEW: Client router
+    app.use("/api/clients", clientRouter);
+    app.use("/api/admin", adminRouter);
 
     app.get("/", (req, res) => {
       res.send("Illustration API is running successfully 🚀");
