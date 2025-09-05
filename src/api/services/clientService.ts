@@ -1,4 +1,4 @@
-import connection from "../configs/snowflake.js";
+import connection from "../configs/snowflake.ts";
 import * as clientSQL from "../models/client-SQL.json";
 
 interface Client {
@@ -208,6 +208,8 @@ class ClientService {
     });
   }
 
+
+
   async createClientInfo(clientData: ClientInfo): Promise<ClientInfo> {
     return new Promise((resolve, reject) => {
       // Generate FULL_NAME if not provided
@@ -223,15 +225,15 @@ class ClientService {
         clientData.LAST_NAME,
         fullName,
         clientData.EMAIL,
-        clientData.PREMIUM,
-        clientData.FIRST_TERM,
-        clientData.SECOND_TERM,
-        clientData.TAX_QUALIFICATION,
-        clientData.WITHDRAWAL_TYPE,
-        clientData.WITHDRAWAL_AMOUNT,
-        clientData.WITHDRAWAL_FROM_YEAR,
-        clientData.WITHDRAWAL_TO_YEAR,
-        clientData.WITHDRAWAL_FREQUENCY,
+        //clientData.PREMIUM,
+       // clientData.FIRST_TERM,
+        //clientData.SECOND_TERM,
+        //clientData.TAX_QUALIFICATION,
+        //clientData.WITHDRAWAL_TYPE,
+       // clientData.WITHDRAWAL_AMOUNT,
+       // clientData.WITHDRAWAL_FROM_YEAR,
+       // clientData.WITHDRAWAL_TO_YEAR,
+      //  clientData.WITHDRAWAL_FREQUENCY,
         clientData.PHONE,
         clientData.DATE_OF_BIRTH,
         clientData.AGE,
@@ -241,7 +243,7 @@ class ClientService {
         clientData.SSN_TAX_ID,
         clientData.RESIDENCE_ADDRESS,
         clientData.STATE,
-        clientData.JURISDICTION
+        //clientData.JURISDICTION
       ];
 
       connection.use(async (clientConnection: any) => {

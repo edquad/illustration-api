@@ -26,6 +26,18 @@ export interface TermInput {
   TERM_DETAILS_VALUE: string;
 }
 
+export interface WithdrawalType {
+  WITHDRAWAL_TYPE_ID: number;
+  WITHDRAWAL_TYPE_VALUE: string;
+  IS_ACTIVE: boolean;
+  CREATED_AT: string;
+  UPDATED_AT: string;
+}
+
+export interface WithdrawalTypeInput {
+  WITHDRAWAL_TYPE_VALUE: string;
+}
+
 class AdminService {
   async getAllProducts(): Promise<Product[]> {
     return new Promise((resolve, reject) => {
@@ -314,6 +326,157 @@ class AdminService {
                 complete: (err2: Error | null, stmt2: any, rows2: any[]) => {
                   if (err2) {
                     console.error("Error fetching toggled term:", err2);
+                    reject(err2);
+                  } else {
+                    resolve(rows2 && rows2.length > 0 ? rows2[0] : null);
+                  }
+                },
+              });
+            }
+          },
+        });
+      });
+    });
+  }
+
+  // Withdrawal Type methods
+  async getAllWithdrawalTypes(): Promise<WithdrawalType[]> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: adminSQL.getAllWithdrawalTypes,
+          binds: [],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in getAllWithdrawalTypes:", err);
+              reject(err);
+            } else {
+              resolve(rows);
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async getWithdrawalTypeById(id: number): Promise<WithdrawalType | null> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: adminSQL.getWithdrawalTypeById,
+          binds: [id],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in getWithdrawalTypeById:", err);
+              reject(err);
+            } else {
+              resolve(rows && rows.length > 0 ? rows[0] : null);
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async createWithdrawalType(withdrawalTypeData: WithdrawalTypeInput): Promise<WithdrawalType> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: adminSQL.createWithdrawalType,
+          binds: [withdrawalTypeData.WITHDRAWAL_TYPE_VALUE],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in createWithdrawalType:", err);
+              reject(err);
+            } else {
+              // Get the created withdrawal type by fetching the last inserted record
+              clientConnection.execute({
+                sqlText: "SELECT WITHDRAWAL_TYPE_ID, WITHDRAWAL_TYPE_VALUE, IS_ACTIVE, CREATED_AT, UPDATED_AT FROM DB_DEV_HARMONIZED.POC.WITHDRAWAL_TYPE WHERE WITHDRAWAL_TYPE_ID = (SELECT MAX(WITHDRAWAL_TYPE_ID) FROM DB_DEV_HARMONIZED.POC.WITHDRAWAL_TYPE)",
+                binds: [],
+                complete: (err2: Error | null, stmt2: any, rows2: any[]) => {
+                  if (err2) {
+                    console.error("Error fetching created withdrawal type:", err2);
+                    reject(err2);
+                  } else {
+                    resolve(rows2[0]);
+                  }
+                },
+              });
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async updateWithdrawalType(id: number, withdrawalTypeData: WithdrawalTypeInput & { IS_ACTIVE: boolean }): Promise<WithdrawalType | null> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: adminSQL.updateWithdrawalType,
+          binds: [withdrawalTypeData.WITHDRAWAL_TYPE_VALUE, withdrawalTypeData.IS_ACTIVE, id],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in updateWithdrawalType:", err);
+              reject(err);
+            } else {
+              // Fetch the updated withdrawal type
+              clientConnection.execute({
+                sqlText: adminSQL.getWithdrawalTypeById,
+                binds: [id],
+                complete: (err2: Error | null, stmt2: any, rows2: any[]) => {
+                  if (err2) {
+                    console.error("Error fetching updated withdrawal type:", err2);
+                    reject(err2);
+                  } else {
+                    resolve(rows2 && rows2.length > 0 ? rows2[0] : null);
+                  }
+                },
+              });
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async deleteWithdrawalType(id: number): Promise<boolean> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: adminSQL.deleteWithdrawalType,
+          binds: [id],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in deleteWithdrawalType:", err);
+              reject(err);
+            } else {
+              resolve(true);
+            }
+          },
+        });
+      });
+    });
+  }
+
+  async toggleWithdrawalTypeStatus(id: number, isActive: boolean): Promise<WithdrawalType | null> {
+    return new Promise((resolve, reject) => {
+      connection.use(async (clientConnection: any) => {
+        clientConnection.execute({
+          sqlText: adminSQL.toggleWithdrawalTypeStatus,
+          binds: [isActive, id],
+          complete: (err: Error | null, stmt: any, rows: any[]) => {
+            if (err) {
+              console.error("Error in toggleWithdrawalTypeStatus:", err);
+              reject(err);
+            } else {
+              // Fetch the updated withdrawal type
+              clientConnection.execute({
+                sqlText: adminSQL.getWithdrawalTypeById,
+                binds: [id],
+                complete: (err2: Error | null, stmt2: any, rows2: any[]) => {
+                  if (err2) {
+                    console.error("Error fetching toggled withdrawal type:", err2);
                     reject(err2);
                   } else {
                     resolve(rows2 && rows2.length > 0 ? rows2[0] : null);

@@ -19,4 +19,12 @@ router.put("/terms/:id", adminController.updateTerm);
 router.delete("/terms/:id", adminController.deleteTerm);
 router.put("/terms/:id/toggle-status", adminController.toggleTermStatus);
 
+// Withdrawal Type routes
+router.get("/withdrawal-types", adminController.getAllWithdrawalTypes);
+router.get("/withdrawal-types/:id", adminController.getWithdrawalTypeById);
+router.post("/withdrawal-types", adminController.createWithdrawalType);
+router.put("/withdrawal-types/:id", adminController.updateWithdrawalType);
+router.delete("/withdrawal-types/:id", adminController.deleteWithdrawalType);
+router.put("/withdrawal-types/:id/toggle-status", adminController.toggleWithdrawalTypeStatus);
+
 export default router;

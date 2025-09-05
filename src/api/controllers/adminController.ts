@@ -275,6 +275,139 @@ export class AdminController {
       res.status(500).json({ error: "Failed to update term status" });
     }
   }
+
+  // Withdrawal Type methods
+  async getAllWithdrawalTypes(req: Request, res: Response): Promise<void> {
+    try {
+      const withdrawalTypes = await adminService.getAllWithdrawalTypes();
+      res.json(withdrawalTypes);
+    } catch (error) {
+      console.error("Error fetching withdrawal types:", error);
+      res.status(500).json({ error: "Failed to fetch withdrawal types" });
+    }
+  }
+
+  async getWithdrawalTypeById(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        res.status(400).json({ error: "Invalid withdrawal type ID" });
+        return;
+      }
+
+      const withdrawalType = await adminService.getWithdrawalTypeById(id);
+      if (!withdrawalType) {
+        res.status(404).json({ error: "Withdrawal type not found" });
+        return;
+      }
+
+      res.json(withdrawalType);
+    } catch (error) {
+      console.error("Error fetching withdrawal type:", error);
+      res.status(500).json({ error: "Failed to fetch withdrawal type" });
+    }
+  }
+
+  async createWithdrawalType(req: Request, res: Response): Promise<void> {
+    try {
+      const { WITHDRAWAL_TYPE_VALUE } = req.body;
+
+      if (!WITHDRAWAL_TYPE_VALUE || typeof WITHDRAWAL_TYPE_VALUE !== "string") {
+        res.status(400).json({ error: "Withdrawal type value is required" });
+        return;
+      }
+
+      const withdrawalTypeData = { WITHDRAWAL_TYPE_VALUE };
+      const newWithdrawalType = await adminService.createWithdrawalType(withdrawalTypeData);
+      res.status(201).json(newWithdrawalType);
+    } catch (error) {
+      console.error("Error creating withdrawal type:", error);
+      res.status(500).json({ error: "Failed to create withdrawal type" });
+    }
+  }
+
+  async updateWithdrawalType(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      const { WITHDRAWAL_TYPE_VALUE, IS_ACTIVE } = req.body;
+
+      if (isNaN(id)) {
+        res.status(400).json({ error: "Invalid withdrawal type ID" });
+        return;
+      }
+
+      if (!WITHDRAWAL_TYPE_VALUE || typeof WITHDRAWAL_TYPE_VALUE !== "string") {
+        res.status(400).json({ error: "Withdrawal type value is required" });
+        return;
+      }
+
+      if (typeof IS_ACTIVE !== "boolean") {
+        res.status(400).json({ error: "IS_ACTIVE must be a boolean" });
+        return;
+      }
+
+      const withdrawalTypeData = { WITHDRAWAL_TYPE_VALUE, IS_ACTIVE };
+      const updatedWithdrawalType = await adminService.updateWithdrawalType(id, withdrawalTypeData);
+
+      if (!updatedWithdrawalType) {
+        res.status(404).json({ error: "Withdrawal type not found" });
+        return;
+      }
+
+      res.json(updatedWithdrawalType);
+    } catch (error) {
+      console.error("Error updating withdrawal type:", error);
+      res.status(500).json({ error: "Failed to update withdrawal type" });
+    }
+  }
+
+  async deleteWithdrawalType(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      if (isNaN(id)) {
+        res.status(400).json({ error: "Invalid withdrawal type ID" });
+        return;
+      }
+
+      const success = await adminService.deleteWithdrawalType(id);
+      if (success) {
+        res.json({ message: "Withdrawal type deleted successfully" });
+      } else {
+        res.status(404).json({ error: "Withdrawal type not found" });
+      }
+    } catch (error) {
+      console.error("Error deleting withdrawal type:", error);
+      res.status(500).json({ error: "Failed to delete withdrawal type" });
+    }
+  }
+
+  async toggleWithdrawalTypeStatus(req: Request, res: Response): Promise<void> {
+    try {
+      const id = parseInt(req.params.id);
+      const { isActive } = req.body;
+
+      if (isNaN(id)) {
+        res.status(400).json({ error: "Invalid withdrawal type ID" });
+        return;
+      }
+
+      if (typeof isActive !== "boolean") {
+        res.status(400).json({ error: "isActive must be a boolean" });
+        return;
+      }
+
+      const updatedWithdrawalType = await adminService.toggleWithdrawalTypeStatus(id, isActive);
+      if (!updatedWithdrawalType) {
+        res.status(404).json({ error: "Withdrawal type not found" });
+        return;
+      }
+
+      res.json(updatedWithdrawalType);
+    } catch (error) {
+      console.error("Error toggling withdrawal type status:", error);
+      res.status(500).json({ error: "Failed to update withdrawal type status" });
+    }
+  }
 }
 
 export default new AdminController();
