@@ -13,7 +13,7 @@ export class ChatbotService {
   private readonly pythonApiUrl = 'http://localhost:5000';
 
   async getFormAutofill(conversation: string): Promise<ChatbotResponse> {
-    try
+    try {
       const response = await axios.post(`${this.pythonApiUrl}/api/form-autofill`, {
         conversation
       }, {
